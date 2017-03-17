@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'ChangeBundleID'
+require 'change_bundleid'
 require 'optparse'
 require 'ostruct'
 
@@ -29,5 +29,5 @@ end
 #puts options
 
 
-ChangeBundleID.change_bundle_id(options.path, options.target, option.conf, options.bundleid, options.verbose, options.skip_plist)
+ChangeBundleID.change_bundle_id(options.path, options.target, options.conf, options.bundleid, options.verbose, options.skip_plist)
 

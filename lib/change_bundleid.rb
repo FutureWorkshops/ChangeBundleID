@@ -3,20 +3,20 @@ require 'xcodeproj'
 require 'plist'
 
 module ChangeBundleID
-  def change_bundle_id(project_filepath, target_name, project_configuration, new_bundle_ID, verbose, skip_plist)
+  def self.change_bundle_id(project_filepath, target_name, project_configuration, new_bundle_ID, verbose, skip_plist)
 
     project_directory=File.dirname project_filepath
-    if File.directory?(project_directory)
+    unless File.directory?(project_directory)
       puts "ERROR: The project folder '#{project_directory}' doesn't exist."
       exit -12
     end
 
-    if File.exists?(project_filepath)
+    unless File.exists?(project_filepath)
       puts "ERROR: The project file '#{project_filepath}' doesn't exist."
       exit -12
     end
 
-    puts "*** Parsing project at '#{project_filepath}'"
+    puts "*** Parsing project at '#{project_filepath}'" if verbose == true
     project = Xcodeproj::Project.open(project_filepath)
     target = project.targets.find { |t| t.name == target_name }
     if target.nil?
@@ -30,14 +30,15 @@ module ChangeBundleID
       exit -12
     end
 
-    puts "*** Setting Xcode Project's PRODUCT_BUNDLE_IDENTIFIER to '#{new_bundle_ID}'" if verbose == true
+    puts "*** Setting Xcode Project's PRODUCT_BUNDLE_IDENTIFIER to '#{new_bundle_ID}' on target '#{target_name}' for configuration '#{project_configuration}'" if verbose == true
 
     configuration.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = new_bundle_ID
     project.save
     
 
-    if skip_plist == true do
+    if skip_plist == true then 
       puts "*** Skipping info_plist" if verbose == true
+      return 0
     end
 
     puts "*** Looking for Info.plist location" if verbose == true
