@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require 'ChangeBundleID'
+require 'optparse'
+require 'ostruct'
+
+options = OpenStruct.new
+options.skip_plist = false
+options.verbose = false
+options.conf = 'Release'
+
+opt_parser = OptionParser.new do |opt|
+  opt.banner = "Usage: change_bundleid [options]" 
+  opt.on('-p', '--path PATH', "[REQUIRED] Path to the Xcode project (xcproject, not xcworkspace)") { |o| options.path = o }
+  opt.on('-t', '--target NAME', "[REQUIRED] Project target") { |o| options.target = o }
+  opt.on('-c', '--conf NAME', "PProject configuration (default = Release)") { |o| options.conf = o }
+  opt.on('-i', '--bundleid NAME', "[REQUIRED] New bundle ID") { |o| options.bundleid = o }
+  opt.on('-s', '--skip-plist', "Don't modify the info.plist file") { options.skip_plist = true }
+  opt.on('-v', '--verbose', "Verbose mode") { options.verbose = true }
+  opt.on_tail("-h", "--help", "Show this message") { puts opt; exit }
+end
+
+opt_parser.parse!(ARGV)
+mandatory = [:path, :target, :conf, :bundleid]
+missing = mandatory.select { |p| options[p].nil? }
+unless missing.empty?
+  raise OptionParser::MissingArgument.new(missing.join(', '))
+end
+#puts options
+
+
+ChangeBundleID.change_bundle_id(options.path, options.target, option.conf, options.bundleid, options.verbose, options.skip_plist)
+
